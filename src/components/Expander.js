@@ -1,7 +1,9 @@
 import React from "react";
 import colors from "../constants/colors";
-import { Icon } from "material-bread";
-export const Expander = ({ expanded, style }) => {
+import {Icon} from "material-bread";
+
+export const Expander = (props) => {
+  const {expanded, style} = props;
   return (
     <Icon
       size={24}

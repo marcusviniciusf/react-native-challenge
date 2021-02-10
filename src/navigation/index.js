@@ -1,6 +1,6 @@
-import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
-import Nodes from '../screens/Nodes';
+import React from "react";
+import {createStackNavigator} from "@react-navigation/stack";
+import Nodes from "../screens/Nodes";
 const Stack = createStackNavigator();
 
 export default function RootStack() {

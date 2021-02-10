@@ -1,72 +1,66 @@
-import React from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import PropTypes from "prop-types";
-import { View, StyleSheet } from "react-native";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import * as actions from "../actions/nodes";
+import {StyleSheet, ScrollView} from "react-native";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {Heading} from "material-bread";
+// Redux
+import * as allActions from "../actions/nodes";
+// UI
 import Node from "../components/Node";
-import { Heading } from "material-bread";
 
-export class Nodes extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      expandedNodeURL: null
-    };
-    this.toggleNodeExpanded = this.toggleNodeExpanded.bind(this);
-  }
+export const Nodes = (props) => {
+  const {actions, nodes} = props;
+  const {list} = nodes;
+  const [expandedNodeURL, setExpandedNodeURL] = useState(null);
 
-  componentDidMount() {
-    this.props.actions.checkNodeStatuses(this.props.nodes.list);
-  }
+  const doInitialFetch = useCallback(() => {
+    actions.checkNodeStatuses(list);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actions]);
 
-  toggleNodeExpanded(node) {
-    this.setState({
-      expandedNodeURL: node.url === this.state.expandedNodeURL ? null : node.url
-    });
-  }
+  useEffect(() => {
+    doInitialFetch();
+  }, [doInitialFetch]);
 
-  render() {
-    const { nodes } = this.props;
-    return (
-      <View>
-        <Heading style={styles.heading} type={4}>
-          Nodes
-        </Heading>
-        {nodes.list.map(node => (
-          <Node
-            node={node}
-            key={node.url}
-            expanded={node.url === this.state.expandedNodeURL}
-            toggleNodeExpanded={this.toggleNodeExpanded}
-          />
-        ))}
-      </View>
-    );
-  }
-}
+  const toggleNodeExpanded = (node) => {
+    setExpandedNodeURL((p) => (node.url === p ? null : node.url));
+  };
+  return (
+    <ScrollView>
+      <Heading style={styles.heading} type={4}>
+        Nodes
+      </Heading>
+      {nodes.list.map((node) => (
+        <Node
+          node={node}
+          key={node.url}
+          expanded={node.url === expandedNodeURL}
+          toggleNodeExpanded={toggleNodeExpanded}
+        />
+      ))}
+    </ScrollView>
+  );
+};
 
 Nodes.propTypes = {
   actions: PropTypes.object.isRequired,
-  nodes: PropTypes.object.isRequired
+  nodes: PropTypes.object.isRequired,
 };
 const styles = StyleSheet.create({
-  heading: { marginLeft: 30, marginTop: 45, fontWeight: "700" }
+  heading: {marginLeft: 30, marginTop: 45, fontWeight: "700"},
 });
 
 function mapStateToProps(state) {
   return {
-    nodes: state.nodes
+    nodes: state.nodes,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(actions, dispatch)
+    actions: bindActionCreators(allActions, dispatch),
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Nodes);
+export default connect(mapStateToProps, mapDispatchToProps)(Nodes);
